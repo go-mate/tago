@@ -14,7 +14,7 @@ import (
 )
 
 func BumpGitTag(gcm *gitgo.Gcm, versionBase int) (bool, error) {
-	zaplog.SUG.Debugln("version-base", versionBase)
+	zaplog.LOG.Debug("bump-git-tag", zap.Int("version-base", versionBase))
 	tagName, err := gcm.LatestGitTag()
 	if err != nil {
 		return false, erero.Wro(err)
@@ -48,9 +48,9 @@ func BumpGitTag(gcm *gitgo.Gcm, versionBase int) (bool, error) {
 			zaplog.SUG.Debugln(string(result))
 			return false, erero.Wro(err)
 		}
-		return false, nil
+		return true, nil
 	}
-	zaplog.SUG.Debugln(tagName)
+	zaplog.LOG.Info("old-tag-name", zap.String("tag", tagName))
 	matches := regexp.MustCompile(`^v(\d+)\.(\d+)\.(\d+)$`).FindStringSubmatch(tagName)
 	if len(matches) != 4 {
 		return false, erero.New("no match")
@@ -74,7 +74,7 @@ func BumpGitTag(gcm *gitgo.Gcm, versionBase int) (bool, error) {
 		}
 	}
 	newTagName := fmt.Sprintf("v%d.%d.%d", vAx, vBx, vCx)
-	zaplog.SUG.Debugln(newTagName)
+	zaplog.LOG.Info("new-tag-name", zap.String("tag", newTagName))
 	if versionBase <= 1 {
 		if !chooseConfirm("do you want to set this new tag? " + newTagName) {
 			return false, nil
