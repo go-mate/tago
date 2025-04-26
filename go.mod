@@ -4,7 +4,7 @@ go 1.22.8
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
-	github.com/go-xlan/gitgo v0.0.15
+	github.com/go-xlan/gitgo v0.0.16
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/yyle88/done v1.0.25

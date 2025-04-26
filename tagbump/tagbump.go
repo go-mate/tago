@@ -27,23 +27,35 @@ func BumpGitTag(gcm *gitgo.Gcm, versionBase int) (bool, error) {
 	return BumpTagNum(gcm, tagName, "v", versionBase)
 }
 
-func BumpSubTag(gcm *gitgo.Gcm, versionBase int) (bool, error) {
-	zaplog.LOG.Debug("bump-sub-tag", zap.Int("version-base", versionBase))
+func BumpSubModuleTag(gcm *gitgo.Gcm, versionBase int) (bool, error) {
+	zaplog.LOG.Debug("bump-sub-module-tag", zap.Int("version-base", versionBase))
 	subPath, err := gcm.GetSubPath()
 	if err != nil {
 		return false, erero.Wro(err)
 	}
 	if subPath == "" {
-		return false, erero.New("not in sub path")
+		return false, erero.New("not in sub-module path")
 	}
 	tagPrefix := filepath.Join(subPath, "v")
-	zaplog.LOG.Debug("bump-sub-tag", zap.String("tag-prefix", tagPrefix))
-	tagName, err := gcm.LatestGitTagWithPrefixPath(tagPrefix)
+	tagRegexp := tagPrefix + "[0-9]*.[0-9]*.[0-9]*"
+	return BumpTagMatchRegexp(gcm, tagPrefix, tagRegexp, versionBase)
+}
+
+func BumpMainTag(gcm *gitgo.Gcm, versionBase int) (bool, error) {
+	zaplog.LOG.Debug("bump-main-tag", zap.Int("version-base", versionBase))
+	tagPrefix := "v"
+	tagRegexp := tagPrefix + "[0-9]*.[0-9]*.[0-9]*"
+	return BumpTagMatchRegexp(gcm, tagPrefix, tagRegexp, versionBase)
+}
+
+func BumpTagMatchRegexp(gcm *gitgo.Gcm, tagPrefix string, tagRegexp string, versionBase int) (bool, error) {
+	zaplog.LOG.Debug("bump-match-regexp-tag", zap.String("tag-prefix", tagPrefix), zap.String("tag-regexp", tagRegexp))
+	tagName, err := gcm.LatestGitTagMatchRegexp(tagRegexp)
 	if err != nil {
 		return false, erero.Wro(err)
 	}
 	if tagName == "" {
-		return false, erero.Errorf("no sub tag name with tag-prefix=((%s))", tagPrefix)
+		return false, erero.Errorf("not match tag name with tag-prefix=((%s)) tag-regexp=((%s))", tagPrefix, tagRegexp)
 	}
 	return BumpTagNum(gcm, tagName, tagPrefix, versionBase)
 }

@@ -9,8 +9,8 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/go-xlan/gitgo v0.0.15 h1:xXQFZR54ml+h/pMKUtlM9Gpu7nX6XQkxPj684YqATCA=
-github.com/go-xlan/gitgo v0.0.15/go.mod h1:mWM+Du0mm77rBTBsNfyDJLHgKeZrINa2EGdRmvMQ578=
+github.com/go-xlan/gitgo v0.0.16 h1:LxaQ7Py5qWELubc2NMow5fXa/NLcO0KIrWRg44TETaw=
+github.com/go-xlan/gitgo v0.0.16/go.mod h1:mWM+Du0mm77rBTBsNfyDJLHgKeZrINa2EGdRmvMQ578=
 github.com/hinshun/vt10x v0.0.0-20220119200601-820417d04eec h1:qv2VnGeEQHchGaZ/u7lxST/RaJw+cv273q79D81Xbog=
 github.com/hinshun/vt10x v0.0.0-20220119200601-820417d04eec/go.mod h1:Q48J4R4DvxnHolD5P8pOtXigYlRuPLGl6moFx3ulM68=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
