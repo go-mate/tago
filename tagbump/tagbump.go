@@ -2,6 +2,7 @@ package tagbump
 
 import (
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"strconv"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/go-xlan/gitgo"
 	"github.com/yyle88/done"
 	"github.com/yyle88/erero"
+	"github.com/yyle88/rese"
 	"github.com/yyle88/zaplog"
 	"go.uber.org/zap"
 )
@@ -20,24 +22,34 @@ func BumpGitTag(gcm *gitgo.Gcm, versionBase int) (bool, error) {
 		return false, erero.Wro(err)
 	}
 	if tagName == "" {
-		zaplog.SUG.Debugln("no tag")
 		return false, erero.New("no tag")
 	}
-	tagHash, err := gcm.GitCommitHash(tagName)
+	return BumpTagNum(gcm, tagName, "v", versionBase)
+}
+
+func BumpSubTag(gcm *gitgo.Gcm, versionBase int) (bool, error) {
+	zaplog.LOG.Debug("bump-sub-tag", zap.Int("version-base", versionBase))
+	subPath, err := gcm.GetSubPath()
 	if err != nil {
 		return false, erero.Wro(err)
 	}
-	if tagHash == "" {
-		return false, erero.New("impossible")
+	if subPath == "" {
+		return false, erero.New("not in sub path")
 	}
-	mainHash, err := gcm.GitCommitHash("main")
+	tagPrefix := filepath.Join(subPath, "v")
+	zaplog.LOG.Debug("bump-sub-tag", zap.String("tag-prefix", tagPrefix))
+	tagName, err := gcm.LatestGitTagWithPrefixPath(tagPrefix)
 	if err != nil {
 		return false, erero.Wro(err)
 	}
-	if mainHash == "" {
-		return false, erero.New("impossible")
+	if tagName == "" {
+		return false, erero.Errorf("no sub tag name with tag-prefix=((%s))", tagPrefix)
 	}
-	if tagHash == mainHash {
+	return BumpTagNum(gcm, tagName, tagPrefix, versionBase)
+}
+
+func BumpTagNum(gcm *gitgo.Gcm, tagName string, tagPrefix string, versionBase int) (bool, error) {
+	if rese.C1(gcm.GitCommitHash(tagName)) == rese.C1(gcm.GitCommitHash("main")) {
 		if versionBase <= 1 {
 			if !chooseConfirm("do you want to push the old tag? " + tagName) {
 				return false, nil
@@ -51,7 +63,9 @@ func BumpGitTag(gcm *gitgo.Gcm, versionBase int) (bool, error) {
 		return true, nil
 	}
 	zaplog.LOG.Info("old-tag-name", zap.String("tag", tagName))
-	matches := regexp.MustCompile(`^v(\d+)\.(\d+)\.(\d+)$`).FindStringSubmatch(tagName)
+	tagRegexp := `^` + regexp.QuoteMeta(tagPrefix) + `(\d+)\.(\d+)\.(\d+)$`
+	zaplog.LOG.Info("check-tag-name-format-with-regexp", zap.String("regexp", tagRegexp))
+	matches := regexp.MustCompile(tagRegexp).FindStringSubmatch(tagName)
 	if len(matches) != 4 {
 		return false, erero.New("no match")
 	}
@@ -73,7 +87,7 @@ func BumpGitTag(gcm *gitgo.Gcm, versionBase int) (bool, error) {
 			vAx++
 		}
 	}
-	newTagName := fmt.Sprintf("v%d.%d.%d", vAx, vBx, vCx)
+	newTagName := fmt.Sprintf("%s%d.%d.%d", tagPrefix, vAx, vBx, vCx)
 	zaplog.LOG.Info("new-tag-name", zap.String("tag", newTagName))
 	if versionBase <= 1 {
 		if !chooseConfirm("do you want to set this new tag? " + newTagName) {
